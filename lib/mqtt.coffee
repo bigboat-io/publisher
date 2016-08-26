@@ -9,4 +9,4 @@ module.exports = (mqttConfig) ->
   client.on 'close', -> console.log 'Connection closed'
 
   publish: (topic, data) ->
-    client.publish "#{config.mqtt.topicNs}#{topic}", JSON.stringify data
+    client.publish "#{mqttConfig.topicNs}#{topic}", JSON.stringify data
