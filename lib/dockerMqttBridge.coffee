@@ -2,11 +2,9 @@
 # Bridges events and information obtained through the Docker API with MQTT
 #
 
-docker  = require './docker'
+Docker  = require './docker'
 
 module.exports = (dockerCfg, mqtt) ->
-  hasDashboardLabels = (event, container) ->
-    event?.Actor?.Attributes?['bigboat/status/url'] or container?.Config?.Labels?['bigboat/status/url']
 
   dockerConfig = if dockerCfg.url.host is '' and dockerCfg.url.path
     socketPath: dockerCfg.url.path
@@ -18,8 +16,8 @@ module.exports = (dockerCfg, mqtt) ->
     console.error 'Docker connection details not properly configured, I got', dockerConfig
     process.exit(1)
 
-  handler = (event, containerInfo, docker) ->
-    mqtt.publish '/events', event
-    mqtt.publish '/container/info', containerInfo if containerInfo
-
-  docker.listen handler, dockerConfig
+  docker = new Docker dockerConfig
+  docker.on '/info', (stats) -> mqtt.publish '/info', stats
+  docker.on '/event', (event) -> mqtt.publish '/events', event
+  docker.on '/container/info', (info) -> mqtt.publish '/container/info', info
+  docker.on '/container/stats', (stats) -> mqtt.publish '/container/stats', stats

@@ -1,41 +1,52 @@
-Docker = require('dockerode')
-module.exports =
+events        = require 'events'
+Docker        = require 'dockerode'
 
-  process_existing_containers: (handler, opts) ->
-    docker = new Docker(opts)
-    i = 10
-    console.log 'Processing all pre-existing containers'
+
+module.exports = (opts) ->
+
+  docker = new Docker(opts)
+  eventEmitter = new events.EventEmitter()
+
+  # Publishes docker inspect info to the eventEmitter
+  publishContainerInfo = (containerId) ->
+    docker.getContainer(containerId).inspect (err, data) ->
+      eventEmitter.emit '/container/info', data unless err
+
+  publishContainerStats = ->
     docker.listContainers { all: 1 }, (err, containers) ->
       containers.forEach (containerInfo) ->
-        docker.getContainer(containerInfo.Id).inspect (err, data) ->
-          if err and !data
-            console.error 'Failed to inspect container: ', err
-          else
-            setTimeout (-> handler and handler(data)), i
-            i = i + 10
+        docker.getContainer(containerInfo.Id).stats stream:0, (err, data) ->
+          console.log err if err
+          chunks = ""
+          data.on 'data', (chunk) -> chunks = "#{chunks}#{chunk}"
+          data.on 'end', ->
+            eventEmitter.emit '/container/stats',
+              container: containerInfo
+              stats: JSON.parse chunks
 
-  listen: (handler, opts) ->
-    docker = new Docker(opts)
+  publishDockerInfo = ->
+    docker.info (err, info) ->
+      eventEmitter.emit '/info', info
+
+  publishExistingContainers = ->
+    i = 10
+    docker.listContainers { all: 1 }, (err, containers) ->
+      containers.forEach (containerInfo) ->
+        setTimeout (-> publishContainerInfo containerInfo.Id), i
+        i = i + 10
+
+  listenForEvents = ->
     trackedEvents = [
       'start'
       'die'
       'destroy'
+      'pull'
     ]
-    # start monitoring docker events
-
-    handleEvent = (event, handler) ->
-      setTimeout ->
-        docker.getContainer(event.id).inspect (err,data) ->
-          if (err)
-            # console.error("Failed to inspect container: ", err)
-            handler && handler(event, null, docker);
-          else
-            handler && handler(event, data, docker)
-      , 500
 
     processDockerEvent = (event, stop) ->
       if trackedEvents.indexOf(event.status) != -1
-        handleEvent event, handler
+        eventEmitter.emit '/event', event
+        setTimeout (-> publishContainerInfo event.id), 500
 
     docker.getEvents (err, data) ->
       if err
@@ -44,7 +55,15 @@ module.exports =
         lines = chunk.toString().replace(/\n$/, '').split('\n')
         lines.forEach (line) ->
           try
-            if line
-              processDockerEvent JSON.parse(line)
+            if line then processDockerEvent JSON.parse(line)
           catch e
             console.log 'Error reading Docker event: %s', e.message, line
+
+
+  publishDockerInfo()
+  publishExistingContainers()
+  publishContainerStats()
+  setInterval publishContainerStats, 10000
+  listenForEvents()
+
+  eventEmitter # return eventEmitter so clients can register callbacks

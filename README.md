@@ -2,6 +2,20 @@
 
 An MQTT Docker publisher for the BigBoat ecosystem.
 
+## About
+
+MQTT Docker publisher publishes data from the Docker API to an MQTT Server.
+Currently the following topics are published:
+
+ * /info
+  (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.23/#/display-system-wide-information)
+ * /event
+ (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.23/#/monitor-docker-s-events)
+ * /container/info (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.23/#/inspect-a-container)
+ * /container/stats (https://docs.docker.com/engine/reference/api/docker_remote_api_v1.23/#/get-container-stats-based-on-resource-usage)
+
+ Each topic is preceded by the value of **MQTT_TOPIC_NS**. This namespace mechanism allows multiple publishers to use the same mqtt server.
+
 ## How to run
 
     docker run \
