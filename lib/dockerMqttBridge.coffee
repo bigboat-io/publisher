@@ -19,5 +19,5 @@ module.exports = (dockerCfg, mqtt) ->
   docker = new Docker dockerConfig
   docker.on '/info', (stats) -> mqtt.publish '/info', stats
   docker.on '/event', (event) -> mqtt.publish '/events', event
-  docker.on '/container/info', (info) -> mqtt.publish '/container/info', info
+  docker.on '/container/inspect', (info) -> mqtt.publish '/container/inspect', info
   docker.on '/container/stats', (stats) -> mqtt.publish '/container/stats', stats

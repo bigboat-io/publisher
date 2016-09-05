@@ -10,7 +10,7 @@ module.exports = (opts) ->
   # Publishes docker inspect info to the eventEmitter
   publishContainerInfo = (containerId) ->
     docker.getContainer(containerId).inspect (err, data) ->
-      eventEmitter.emit '/container/info', data unless err
+      eventEmitter.emit '/container/inspect', data unless err
 
   publishContainerStats = ->
     docker.listContainers { all: 1 }, (err, containers) ->
@@ -20,9 +20,13 @@ module.exports = (opts) ->
           chunks = ""
           data.on 'data', (chunk) -> chunks = "#{chunks}#{chunk}"
           data.on 'end', ->
-            eventEmitter.emit '/container/stats',
-              container: containerInfo
-              stats: JSON.parse chunks
+            try
+              parsed = JSON.parse chunks
+              eventEmitter.emit '/container/stats',
+                container: containerInfo
+                stats: parsed
+            catch e
+              console.error 'Error during parsing JSON stats', e
 
   publishDockerInfo = ->
     docker.info (err, info) ->
@@ -44,9 +48,9 @@ module.exports = (opts) ->
     ]
 
     processDockerEvent = (event, stop) ->
-      if trackedEvents.indexOf(event.status) != -1
-        eventEmitter.emit '/event', event
-        setTimeout (-> publishContainerInfo event.id), 500
+      # if trackedEvents.indexOf(event.status) != -1
+      eventEmitter.emit '/event', event
+      setTimeout (-> publishContainerInfo event.id), 500
 
     docker.getEvents (err, data) ->
       if err
