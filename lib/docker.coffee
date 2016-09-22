@@ -16,17 +16,19 @@ module.exports = (opts) ->
     docker.listContainers { all: 1 }, (err, containers) ->
       containers.forEach (containerInfo) ->
         docker.getContainer(containerInfo.Id).stats stream:0, (err, data) ->
-          console.log err if err
-          chunks = ""
-          data.on 'data', (chunk) -> chunks = "#{chunks}#{chunk}"
-          data.on 'end', ->
-            try
-              parsed = JSON.parse chunks
-              eventEmitter.emit '/container/stats',
-                container: containerInfo
-                stats: parsed
-            catch e
-              console.error 'Error during parsing JSON stats', e
+          if err
+            console.log err
+          else
+            chunks = ""
+            data.on 'data', (chunk) -> chunks = "#{chunks}#{chunk}"
+            data.on 'end', ->
+              try
+                parsed = JSON.parse chunks
+                eventEmitter.emit '/container/stats',
+                  container: containerInfo
+                  stats: parsed
+              catch e
+                console.error 'Error during parsing JSON stats', e
 
   publishDockerInfo = ->
     docker.info (err, info) ->
