@@ -68,8 +68,8 @@ module.exports = (opts) ->
 
   publishDockerInfo()
   publishExistingContainers()
-  publishContainerStats()
-  setInterval publishContainerStats, 10000
+  # publishContainerStats()
+  # setInterval publishContainerStats, 10000
   listenForEvents()
 
   eventEmitter # return eventEmitter so clients can register callbacks
