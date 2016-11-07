@@ -15,7 +15,7 @@ module.exports = (opts) ->
   publishContainerStats = ->
     docker.listContainers { all: 1 }, (err, containers) ->
       containers.forEach (containerInfo) ->
-        docker.getContainer(containerInfo.Id).stats stream:0, (err, data) ->
+        docker.getContainer(containerInfo.Id).stats stream:1, (err, data) ->
           if err
             console.log err
           else
@@ -28,7 +28,7 @@ module.exports = (opts) ->
                   container: containerInfo
                   stats: parsed
               catch e
-                console.error 'Error during parsing JSON stats', e
+                console.error 'Error during parsing JSON stats', e, "Chunks I got so far: #{chunks}"
 
   publishDockerInfo = ->
     docker.info (err, info) ->
