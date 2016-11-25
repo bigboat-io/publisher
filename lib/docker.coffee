@@ -10,6 +10,7 @@ module.exports = (opts) ->
   # Publishes docker inspect info to the eventEmitter
   publishContainerInfo = (containerId) ->
     docker.getContainer(containerId).inspect (err, data) ->
+      console.log 'emit /container/inspect', containerId
       eventEmitter.emit '/container/inspect', data unless err
 
   publishContainerStats = ->
@@ -32,6 +33,7 @@ module.exports = (opts) ->
 
   publishDockerInfo = ->
     docker.info (err, info) ->
+      console.log 'emit /info'
       eventEmitter.emit '/info', info
 
   publishExistingContainers = ->
@@ -51,19 +53,20 @@ module.exports = (opts) ->
 
     processDockerEvent = (event, stop) ->
       # if trackedEvents.indexOf(event.status) != -1
+      console.log 'emit /event', event.id
       eventEmitter.emit '/event', event
       setTimeout (-> publishContainerInfo event.id), 500
 
     docker.getEvents (err, data) ->
       if err
-        console.log('Error getting docker events: %s', err.message, err)
+        console.error('Error getting docker events: %s', err.message, err)
       data.on 'data', (chunk) ->
         lines = chunk.toString().replace(/\n$/, '').split('\n')
         lines.forEach (line) ->
           try
             if line then processDockerEvent JSON.parse(line)
           catch e
-            console.log 'Error reading Docker event: %s', e.message, line
+            console.error 'Error reading Docker event: %s', e.message, line
 
 
   publishDockerInfo()
