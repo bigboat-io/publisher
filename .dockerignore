@@ -1,3 +1,5 @@
 .git
 node_modules
+typings
+built
 npm-debug.log

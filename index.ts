@@ -1,0 +1,19 @@
+
+import url = require('url');
+import { assert } from './lib/env';
+import Mqtt from './lib/mqtt';
+import DockerMqttBridge from "./lib/dockerMqttBridge";
+
+const config = {
+    mqtt: {
+        url: assert("MQTT_URL"),
+        topicNs: assert("MQTT_TOPIC_NS")
+    },
+    docker: {
+        url: url.parse(assert("DOCKER_HOST"))
+    }
+};
+
+new DockerMqttBridge(config.docker, Mqtt(config.mqtt));
+
+console.log("wieee")
