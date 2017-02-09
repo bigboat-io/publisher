@@ -28,7 +28,7 @@ export default function(dockerCfg, mqtt): void {
       }
     }
 
-    docker = Docker(dockerConfig);
+    docker = Docker(dockerConfig, dockerCfg.filter);
     docker.on("/info", (stats) => mqtt.publish("/info", stats));
     docker.on("/event", (event) => mqtt.publish("/events", event));
     docker.on("/container/inspect", (info) => mqtt.publish("/container/inspect", info));

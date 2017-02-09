@@ -10,7 +10,8 @@ const config = {
         topicNs: assert("MQTT_TOPIC_NS")
     },
     docker: {
-        url: url.parse(assert("DOCKER_HOST"))
+        url: url.parse(assert("DOCKER_HOST")),
+        filter: JSON.parse(process.env["DOCKER_EVENTS_FILTER"] || "{}")
     }
 };
 

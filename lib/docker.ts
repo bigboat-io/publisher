@@ -1,7 +1,7 @@
 const events = require("events");
 const Docker = require("dockerode");
 
-export default (opts) => {
+export default (opts, filter) => {
     var docker, eventEmitter;
     docker = new Docker(opts);
     eventEmitter = new events.EventEmitter();
@@ -59,7 +59,8 @@ export default (opts) => {
         var i;
         i = 10;
         return docker.listContainers({
-            all: 1
+            all: 1,
+            filters: filter
         }, (err, containers) => containers.forEach((containerInfo) => {
                 setTimeout((() => publishContainerInfo(containerInfo.Id)), i);
                 i = i + 10;
@@ -67,17 +68,17 @@ export default (opts) => {
     }
 
     function listenForEvents() {
-        var trackedEvents;
-        trackedEvents = ["start", "die", "destroy", "pull"];
+        const trackedEvents = ["start", "die", "destroy", "pull"];
 
         function processDockerEvent(event) {
             // if trackedEvents.indexOf(event.status) != -1
             console.log("emit /event", event.id);
+            console.log("event", event)
             eventEmitter.emit("/event", event);
             setTimeout((() => publishContainerInfo(event.id)), 500);
         }
 
-        return docker.getEvents((err, data) => {
+        return docker.getEvents({filters: filter},(err, data) => {
             if (err) {
                 console.error("Error getting docker events: %s", err.message, err);
             }
