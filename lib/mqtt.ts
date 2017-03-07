@@ -4,7 +4,10 @@ mqtt = require("mqtt");
 
 export default (mqttConfig) => {
     var client;
-    client = mqtt.connect(mqttConfig.url);
+    client = mqtt.connect(mqttConfig.url, {
+      username: mqttConfig.user,
+      password: mqttConfig.pass
+    });
     client.on("connect", () => console.log("Connected to", mqttConfig.url));
 
     client.on("error", (err) => console.error("An error occured", err));

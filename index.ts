@@ -7,6 +7,8 @@ import DockerMqttBridge from "./lib/dockerMqttBridge";
 const config = {
     mqtt: {
         url: assert("MQTT_URL"),
+        user: assert("MQTT_USER"),
+        pass: assert("MQTT_PASS"),
         topicNs: assert("MQTT_TOPIC_NS")
     },
     docker: {
