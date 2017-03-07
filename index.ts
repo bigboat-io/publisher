@@ -1,14 +1,14 @@
 
 import url = require('url');
-import { assert } from './lib/env';
+import { assert, get } from './lib/env';
 import Mqtt from './lib/mqtt';
 import DockerMqttBridge from "./lib/dockerMqttBridge";
 
 const config = {
     mqtt: {
         url: assert("MQTT_URL"),
-        user: assert("MQTT_USER"),
-        pass: assert("MQTT_PASS"),
+        user: get("MQTT_USER", null),
+        pass: get("MQTT_PASS", null),
         topicNs: assert("MQTT_TOPIC_NS")
     },
     docker: {
