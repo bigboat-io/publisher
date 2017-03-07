@@ -11,4 +11,6 @@ const assert = envName => {
     }
 };
 
-export { assert };
+const get = (envName, deflt) => process.env[envName] || deflt
+
+export { assert, get };
