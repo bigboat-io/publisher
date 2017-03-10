@@ -12,6 +12,8 @@ export default (opts, filter) => {
             console.log("emit /container/inspect", containerId);
             if (!err) {
                 eventEmitter.emit("/container/inspect", data);
+            } else {
+              console.error(`Errror occured while inspecting container with ${containerId}`, err)
             }
         });
     }
@@ -68,14 +70,15 @@ export default (opts, filter) => {
     }
 
     function listenForEvents() {
-        const trackedEvents = ["start", "die", "destroy", "pull"];
+        const inspectOnEvents = ["create", "start", "kill", "die", "stop", "dead", "destroy", "top", "health_status: healthy", "health_status: unhealthy"];
 
         function processDockerEvent(event) {
-            // if trackedEvents.indexOf(event.status) != -1
-            console.log("emit /event", event.id);
-            console.log("event", event)
-            eventEmitter.emit("/event", event);
-            setTimeout((() => publishContainerInfo(event.id)), 500);
+              console.log("emit /event", event.id);
+              console.log("event", event)
+              eventEmitter.emit("/event", event);
+            if(inspectOnEvents.indexOf(event.status) != -1){
+              setTimeout((() => publishContainerInfo(event.id)), 500);
+            }
         }
 
         return docker.getEvents({filters: filter},(err, data) => {
