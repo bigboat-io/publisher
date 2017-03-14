@@ -13,7 +13,8 @@ const config = {
     },
     docker: {
         url: url.parse(assert("DOCKER_HOST")),
-        filter: JSON.parse(process.env["DOCKER_EVENTS_FILTER"] || "{}")
+        filter: JSON.parse(process.env["DOCKER_EVENTS_FILTER"] || "{}"),
+        snapshotInterval: get("SNAPSHOT_INTERVAL", 60000),
     }
 };
 
