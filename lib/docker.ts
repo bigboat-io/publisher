@@ -1,7 +1,7 @@
 const events = require("events");
 const Docker = require("dockerode");
 
-export default (opts, filter) => {
+export default (opts, filter, snapshotInterval) => {
   var docker, eventEmitter;
   docker = new Docker(opts);
   eventEmitter = new events.EventEmitter();
@@ -96,11 +96,23 @@ export default (opts, filter) => {
     });
   }
 
+  function publishContainerIdsSnapshot(){
+    docker.listContainers({all: 1, filters: filter}, (err, containers) => {
+      const containerIds = containers.map((c)=>{return c.Id});
+      eventEmitter.emit("/snapshot/containerIds", containerIds);
+      console.log('emit /snapshot/containerIds',containerIds);
+    });
+  }
+
   publishDockerInfo();
   publishExistingContainers();
+  // publishContainerIdsSnapshot();
   // publishContainerStats()
   // setInterval publishContainerStats, 10000
   listenForEvents();
+
+  // setup periodical emitters
+  setInterval(publishContainerIdsSnapshot, snapshotInterval);
 
   return eventEmitter;  // return eventEmitter so clients can register callbacks
 };
