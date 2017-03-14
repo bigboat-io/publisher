@@ -96,11 +96,11 @@ export default (opts, filter) => {
     });
   }
 
-    publishDockerInfo();
-    publishExistingContainers();
-    // publishContainerStats()
-    // setInterval publishContainerStats, 10000
-    listenForEvents();
+  publishDockerInfo();
+  publishExistingContainers();
+  // publishContainerStats()
+  // setInterval publishContainerStats, 10000
+  listenForEvents();
 
-    return eventEmitter;  // return eventEmitter so clients can register callbacks
+  return eventEmitter;  // return eventEmitter so clients can register callbacks
 };
