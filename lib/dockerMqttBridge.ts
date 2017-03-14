@@ -28,9 +28,10 @@ export default function(dockerCfg, mqtt): void {
       }
     }
 
-    docker = Docker(dockerConfig, dockerCfg.filter);
+    docker = Docker(dockerConfig, dockerCfg.filter, dockerCfg.snapshotInterval);
     docker.on("/info", (stats) => mqtt.publish("/info", stats));
     docker.on("/event", (event) => mqtt.publish("/events", event));
     docker.on("/container/inspect", (info) => mqtt.publish("/container/inspect", info));
     docker.on("/container/stats", (stats) => mqtt.publish("/container/stats", stats));
+    docker.on("/snapshot/containerIds", (ids) => { mqtt.publish("/snapshot/containerIds", ids)});
 };
