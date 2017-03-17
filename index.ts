@@ -19,5 +19,3 @@ const config = {
 };
 
 new DockerMqttBridge(config.docker, Mqtt(config.mqtt));
-
-console.log("wieee")
