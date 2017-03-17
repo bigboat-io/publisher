@@ -76,10 +76,16 @@ export default (opts, filter, snapshotInterval) => {
       }
     }
 
-    return docker.getEvents({filters: filter},(err, data) => {
+    docker.getEvents({filters: filter},(err, data) => {
       if (err) {
-        console.error("Error getting docker events: %s", err.message, err);
+        console.error("Error while retrieving events: %s", err.message, err);
+        setTimeout(listenForEvents, 1000);
+        return;
       }
+      data.on("close", (err) => {
+        console.error("Docker event stream closed");
+        setTimeout(listenForEvents, 500);
+      });
       return data.on("data", (chunk) => {
         var lines;
         lines = chunk.toString().replace(/\n$/, "").split("\n");
