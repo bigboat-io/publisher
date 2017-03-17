@@ -2,15 +2,14 @@ const events = require("events");
 const Docker = require("dockerode");
 
 export default (opts, filter, snapshotInterval) => {
-  var docker, eventEmitter;
-  docker = new Docker(opts);
-  eventEmitter = new events.EventEmitter();
+  const docker = new Docker(opts);
+  const eventEmitter = new events.EventEmitter();
 
   // Publishes docker inspect info to the eventEmitter
   function publishContainerInfo(containerId) {
     docker.getContainer(containerId).inspect((err, data) => {
-      console.log("emit /container/inspect", containerId);
       if (!err) {
+        console.log("emit /container/inspect", containerId);
         eventEmitter.emit("/container/inspect", data);
       } else {
         console.error(`Errror occured while inspecting container with ${containerId}`, err)
@@ -22,7 +21,10 @@ export default (opts, filter, snapshotInterval) => {
     docker.listContainers({
       all: 1,
       filters: filter
-    }, (err, containers) =>
+    }, (err, containers) => {
+      if (err) {
+        return console.error("Error while listing containers: %s", err.message, err);
+      }
       containers.forEach((containerInfo) =>
         docker.getContainer(containerInfo.Id).stats({stream: 1}, (err, data) => {
           var chunks;
@@ -43,11 +45,15 @@ export default (opts, filter, snapshotInterval) => {
               }
             });
           }
-      })));
+      }));
+    });
   }
 
   function publishDockerInfo() {
     return docker.info((err, info) => {
+      if (err) {
+        return console.error("Error while retrieving Docker info: %s", err.message, err);
+      }
       console.log("emit /info");
       eventEmitter.emit("/info", info);
     });
@@ -58,10 +64,15 @@ export default (opts, filter, snapshotInterval) => {
     return docker.listContainers({
       all: 1,
       filters: filter
-    }, (err, containers) => containers.forEach((containerInfo) => {
-      setTimeout((() => publishContainerInfo(containerInfo.Id)), i);
-      i = i + 10;
-    }));
+    }, (err, containers) => {
+      if (err) {
+        return console.error("Error while listing containers: %s", err.message, err);
+      }
+      containers.forEach((containerInfo) => {
+        setTimeout((() => publishContainerInfo(containerInfo.Id)), i);
+        i = i + 10;
+      });
+    });
   }
 
   function listenForEvents() {
@@ -69,7 +80,6 @@ export default (opts, filter, snapshotInterval) => {
 
     function processDockerEvent(event) {
       console.log("emit /event", event.id);
-      console.log("event", event)
       eventEmitter.emit("/event", event);
       if(inspectOnEvents.indexOf(event.status) != -1){
         setTimeout((() => publishContainerInfo(event.id)), 500);
@@ -83,7 +93,7 @@ export default (opts, filter, snapshotInterval) => {
         return;
       }
       data.on("close", (err) => {
-        console.error("Docker event stream closed");
+        console.error("Docker event stream closed unexpectedly!");
         setTimeout(listenForEvents, 500);
       });
       return data.on("data", (chunk) => {
@@ -104,6 +114,9 @@ export default (opts, filter, snapshotInterval) => {
 
   function publishContainerIdsSnapshot(){
     docker.listContainers({all: 1, filters: filter}, (err, containers) => {
+      if(err){
+        return console.error("Error while retrieving container ids for snapshot: %s", err.message, err);
+      }
       const containerIds = containers.map((c)=>{return c.Id});
       eventEmitter.emit("/snapshot/containerIds", containerIds);
       console.log('emit /snapshot/containerIds',containerIds);
@@ -112,9 +125,6 @@ export default (opts, filter, snapshotInterval) => {
 
   publishDockerInfo();
   publishExistingContainers();
-  // publishContainerIdsSnapshot();
-  // publishContainerStats()
-  // setInterval publishContainerStats, 10000
   listenForEvents();
 
   // setup periodical emitters
