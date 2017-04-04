@@ -4,7 +4,7 @@
   "description": "An MQTT Docker publisher for the BigBoat ecosystem",
   "main": "index.coffee",
   "scripts": {
-    "start": "forever --minUptime 2500 --spinSleepTime 5000 ./built/index.js",
+    "start": "forever --minUptime 2500 --spinSleepTime 5000 ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
