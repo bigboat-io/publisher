@@ -1,4 +1,8 @@
 # MQTT Docker Publisher
+[![CircleCI](https://img.shields.io/circleci/project/github/ICTU/bigboat-docker-publisher.svg)](https://circleci.com/gh/ICTU/bigboat-docker-publisher)
+[![Coverage Status](https://coveralls.io/repos/github/ICTU/bigboat-docker-publisher/badge.svg?branch=master)](https://coveralls.io/github/ICTU/bigboat-docker-publisher?branch=master)
+[![codecov](https://codecov.io/gh/ICTU/bigboat-docker-publisher/branch/master/graph/badge.svg)](https://codecov.io/gh/ICTU/bigboat-docker-publisher)
+
 
 An MQTT Docker publisher for the BigBoat ecosystem.
 
