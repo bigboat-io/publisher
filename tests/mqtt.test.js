@@ -22,11 +22,17 @@ describe('mqtt', () => {
     td.when(realMqtt.connect('mqtt://host', {username: 'username', password: 'passwd123'})).thenReturn(client)
     myMqtt = mqtt(config, consol);
   });
-  it('returns an mqtt instance with publish capabilities', () => {
+  it('should return an mqtt instance with publish capabilities', () => {
     expect(myMqtt.publish).to.be.a('function');
     myMqtt.publish('myTopic', {some:'data'});
     td.verify(client.publish('/docker/myTopic', '{"some":"data"}', td.matchers.anything(), td.matchers.anything()));
   });
+  it('should log when an error occurs while publishing to the mqtt server', () => {
+    myMqtt.publish('myTopic', {});
+    td.verify(client.publish(td.matchers.anything(), td.matchers.anything(), td.matchers.anything(), captor.capture()));
+    captor.value('err');
+    td.verify(consol.error('/docker/myTopic', 'err'));
+  })
   it('should log when connected to the server', () => {
     td.verify(client.on('connect', captor.capture()));
     captor.value();
@@ -36,5 +42,10 @@ describe('mqtt', () => {
     td.verify(client.on('error', captor.capture()));
     captor.value('myerr');
     td.verify(consol.error('An error occured', 'myerr'));
+  });
+  it('should log when the connection to the mqtt server is closed', () => {
+    td.verify(client.on('close', captor.capture()));
+    captor.value();
+    td.verify(consol.log('Connection closed'));
   });
 });
