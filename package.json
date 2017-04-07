@@ -9,7 +9,9 @@
     "test:watch": "mocha --watch --recursive tests",
     "test:coverage": "nyc --reporter=html --reporter=text --reporter=lcov npm test",
     "test:mutation": "stryker run",
-    "test:reports": "npm run test:coverage && npm run test:mutation"
+    "test:reports": "npm run test:coverage && npm run test:mutation",
+    "eslint": "eslint -c .eslintrc.js  ./src/**.js",
+    "precommit": "npm test && npm run eslint"
   },
   "keywords": [
     "bigboat",
@@ -25,6 +27,12 @@
     "mqtt": "^2.4.0"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "coveralls": "^2.13.0",
+    "eslint": "^3.19.0",
+    "eslint-config-standard": "^10.2.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
     "husky": "^0.13.3",
     "mocha": "^3.2.0",
     "nyc": "^10.2.0",
@@ -32,9 +40,7 @@
     "stryker-api": "^0.4.2",
     "stryker-html-reporter": "^0.3.0",
     "stryker-mocha-runner": "^0.2.0",
-    "testdouble": "^2.1.2",
-    "chai": "^3.5.0",
-    "coveralls": "^2.13.0"
+    "testdouble": "^2.1.2"
   },
   "nyc": {
     "include": [
