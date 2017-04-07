@@ -5,7 +5,9 @@
   "main": "index.coffee",
   "scripts": {
     "start": "forever --minUptime 2500 --spinSleepTime 5000 ./index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --recursive tests",
+    "test:watch": "mocha --watch --recursive tests",
+    "test:coverage": "nyc --reporter=html --reporter=text npm test"
   },
   "keywords": [
     "bigboat",
@@ -17,7 +19,22 @@
   "license": "Apache-2.0",
   "dependencies": {
     "dockerode": "^2.3.0",
-    "mqtt": "^2.4.0",
-    "forever": "^0.15.2"
+    "forever": "^0.15.2",
+    "mqtt": "^2.4.0"
+  },
+  "devDependencies": {
+    "husky": "^0.13.3",
+    "mocha": "^3.2.0",
+    "nyc": "^10.2.0",
+    "stryker": "^0.5.9",
+    "stryker-api": "^0.4.2",
+    "stryker-html-reporter": "^0.3.0",
+    "stryker-mocha-runner": "^0.2.0",
+    "testdouble": "^2.1.2"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.js"
+    ]
   }
 }
