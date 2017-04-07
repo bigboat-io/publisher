@@ -7,7 +7,9 @@
     "start": "forever --minUptime 2500 --spinSleepTime 5000 ./index.js",
     "test": "mocha --recursive tests",
     "test:watch": "mocha --watch --recursive tests",
-    "test:coverage": "nyc --reporter=html --reporter=text npm test"
+    "test:coverage": "nyc --reporter=html --reporter=text --reporter=lcov npm test",
+    "test:mutation": "stryker run",
+    "test:reports": "npm run test:coverage && npm run test:mutation"
   },
   "keywords": [
     "bigboat",
@@ -30,7 +32,9 @@
     "stryker-api": "^0.4.2",
     "stryker-html-reporter": "^0.3.0",
     "stryker-mocha-runner": "^0.2.0",
-    "testdouble": "^2.1.2"
+    "testdouble": "^2.1.2",
+    "chai": "^3.5.0",
+    "coveralls": "^2.13.0"
   },
   "nyc": {
     "include": [
