@@ -10,6 +10,7 @@ test:
   override:
     - docker run --rm -v $PWD:$PWD -w $PWD node:7 sh -c 'npm install; npm test'
     - docker run --rm -v $PWD:$PWD -w $PWD node:7 sh -c 'npm install; npm run test:reports'
+    - docker run --rm -v $PWD:$PWD -w $PWD node:7 sh -c 'npm install; npm run eslint'
   post:
     - cp -r ./coverage/ $CIRCLE_ARTIFACTS
     - cp -r ./reports/mutation/ $CIRCLE_ARTIFACTS
