@@ -1,7 +1,7 @@
 const url = require('url');
-const {assert, get} = require('./lib/env');
-const Mqtt = require('./lib/mqtt');
-const DockerMqttBridge = require("./lib/dockerMqttBridge");
+const {assert, get} = require('./src/env');
+const Mqtt = require('./src/mqtt');
+const DockerMqttBridge = require("./src/dockerMqttBridge");
 
 const config = {
     mqtt: {
