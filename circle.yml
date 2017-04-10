@@ -10,7 +10,7 @@ test:
   override:
     - docker run --rm -v $PWD:$PWD -w $PWD -v $CIRCLE_TEST_REPORTS:$CIRCLE_TEST_REPORTS -e MOCHA_FILE=$CIRCLE_TEST_REPORTS/junit/test-results.xml node:7 sh -c 'npm test'
     - docker run --rm -v $PWD:$PWD -w $PWD node:7 sh -c 'npm run test:reports'
-    - docker run --rm -v $PWD:$PWD -w $PWD -v $CIRCLE_TEST_REPORTS:$CIRCLE_TEST_REPORTS node:7 sh -c 'npm run eslint -- --format junit --output-file $CIRCLE_TEST_REPORTS/reports/eslint.xml'
+    - docker run --rm -v $PWD:$PWD -w $PWD -v $CIRCLE_TEST_REPORTS:$CIRCLE_TEST_REPORTS node:7 sh -c "npm run eslint -- --format junit --output-file $CIRCLE_TEST_REPORTS/reports/eslint.xml" 
   post:
     - cp -r ./coverage/ $CIRCLE_ARTIFACTS
     - cp -r ./reports/mutation/ $CIRCLE_ARTIFACTS
