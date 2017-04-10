@@ -1,7 +1,7 @@
 const events = require('events')
 const Docker = require('dockerode')
 
-module.exports = (opts, filter, snapshotInterval) => {
+module.exports = (opts, filter, snapshotInterval, _setInterval=setInterval) => {
   const docker = new Docker(opts)
   const eventEmitter = new events.EventEmitter()
 
@@ -128,7 +128,7 @@ module.exports = (opts, filter, snapshotInterval) => {
   listenForEvents()
 
   // setup periodical emitters
-  setInterval(publishContainerIdsSnapshot, snapshotInterval)
+  _setInterval(publishContainerIdsSnapshot, snapshotInterval)
 
   return eventEmitter  // return eventEmitter so clients can register callbacks
 }
