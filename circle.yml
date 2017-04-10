@@ -4,11 +4,11 @@ machine:
 
 dependencies:
   override:
-    - echo "no install"
+    - docker run --rm -v $PWD:$PWD -w $PWD node:7 sh -c 'npm install'
 
 test:
   override:
-    - docker run --rm -v $PWD:$PWD -w $PWD node:7 sh -c 'npm install; npm test'
+    - docker run --rm -v $PWD:$PWD -w $PWD -v $CIRCLE_TEST_REPORTS:$CIRCLE_TEST_REPORTS -e MOCHA_FILE=$CIRCLE_TEST_REPORTS/junit/test-results.xml node:7 sh -c 'npm test'
     - docker run --rm -v $PWD:$PWD -w $PWD node:7 sh -c 'npm install; npm run test:reports'
     - docker run --rm -v $PWD:$PWD -w $PWD node:7 sh -c 'npm install; npm run eslint'
   post:

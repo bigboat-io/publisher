@@ -5,7 +5,7 @@
   "main": "index.coffee",
   "scripts": {
     "start": "forever --minUptime 2500 --spinSleepTime 5000 ./index.js",
-    "test": "mocha --recursive tests",
+    "test": "mocha --reporter mocha-junit-reporter --recursive tests",
     "test:watch": "mocha --watch --recursive tests",
     "test:coverage": "nyc --reporter=html --reporter=text --reporter=lcov npm test",
     "test:mutation": "stryker run",
@@ -35,6 +35,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "husky": "^0.13.3",
     "mocha": "^3.2.0",
+    "mocha-junit-reporter": "^1.13.0",
     "nyc": "^10.2.0",
     "stryker": "^0.5.9",
     "stryker-api": "^0.4.2",
