@@ -3,3 +3,5 @@
 coverage
 reports
 .stryker-tmp
+/eslint.xml
+/test-results.xml
