@@ -14,6 +14,7 @@ module.exports = {
       "describe": true,
       "it": true,
       "beforeEach": true,
+      "afterEach": true,
     },
     "rules": {
         "indent": [

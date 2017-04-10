@@ -1,7 +1,7 @@
 const events = require('events')
 const Docker = require('dockerode')
 
-module.exports = (opts, filter, snapshotInterval, _setInterval=setInterval) => {
+module.exports = (opts, filter, snapshotInterval, _setInterval=setInterval, _setTimeout=setTimeout) => {
   const docker = new Docker(opts)
   const eventEmitter = new events.EventEmitter()
 
@@ -69,7 +69,7 @@ module.exports = (opts, filter, snapshotInterval, _setInterval=setInterval) => {
         return console.error('Error while listing containers: %s', err.message, err)
       }
       containers.forEach((containerInfo) => {
-        setTimeout((() => publishContainerInfo(containerInfo.Id)), i)
+        _setTimeout((() => publishContainerInfo(containerInfo.Id)), i)
         i = i + 10
       })
     })
@@ -82,19 +82,19 @@ module.exports = (opts, filter, snapshotInterval, _setInterval=setInterval) => {
       console.log('emit /event', event.id)
       eventEmitter.emit('/event', event)
       if(inspectOnEvents.indexOf(event.status) != -1){
-        setTimeout((() => publishContainerInfo(event.id)), 500)
+        _setTimeout((() => publishContainerInfo(event.id)), 500)
       }
     }
 
     docker.getEvents({filters: filter}, (err, data) => {
       if (err) {
         console.error('Error while retrieving events: %s', err.message, err)
-        setTimeout(listenForEvents, 1000)
+        _setTimeout(listenForEvents, 1000)
         return
       }
       data.on('close', () => {
         console.error('Docker event stream closed unexpectedly!')
-        setTimeout(listenForEvents, 500)
+        _setTimeout(listenForEvents, 500)
       })
       return data.on('data', (chunk) => {
         var lines
